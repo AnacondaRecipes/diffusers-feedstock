@@ -26,10 +26,10 @@ requirements:
   run:
     - python
     - filelock
-    - huggingface_hub
+    - huggingface_hub >=0.10.0
     - importlib-metadata
     - numpy
-    - pillow
+    - pillow <10.0
     - regex !=2019.12.17
     - requests
     - pytorch >=1.4
