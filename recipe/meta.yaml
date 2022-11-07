@@ -43,9 +43,11 @@ test:
 
 about:
   home: https://github.com/huggingface/diffusers
-  summary: Diffusers
   license: Apache-2.0
   license_file: LICENSE
+  license_family: "Apache"
+  license_url: https://github.com/huggingface/diffusers/blob/v{{ version }}/LICENSE
+  summary: Diffusers provides pretrained vision diffusion models, and serves as a modular toolbox for inference and training.
   description: |
     :hugs: Diffusers provides pretrained diffusion models across multiple modalities, 
     such as vision and audio, and serves as a modular toolbox for inference and 
@@ -53,7 +55,8 @@ about:
 
     PyPI: [https://pypi.org/project/diffusers/](https://pypi.org/project/diffusers/)
 
-  doc_url: https://github.com/huggingface/diffusers
+  doc_url: https://huggingface.co/docs/diffusers/index
+  doc_source_url: https://github.com/huggingface/diffusers/tree/main/docs/source
   dev_url: https://github.com/huggingface/diffusers
 
 extra:
