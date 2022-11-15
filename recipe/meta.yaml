@@ -97,6 +97,28 @@ outputs:
       requires:
         - pip
 
+  - name: diffusers
+    script: build_base.sh  # [not win]
+    build:
+      skip: true  # [win]
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+      run:
+        - {{ pin_subpackage(name+'-torch', exact=True) }}
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
+
 about:
   home: https://github.com/huggingface/diffusers
   license: Apache-2.0
