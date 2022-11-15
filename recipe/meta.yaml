@@ -3,46 +3,99 @@
 
 
 package:
-  name: {{ name|lower }}
+  name: {{ name|lower }}-suite
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/diffusers-{{ version }}.tar.gz
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: fb814ffd150cc6f470380b8c6a521181a77beb2f44134d2aad2e4cd8aa2ced0e
 
 build:
   number: 0
   skip: true  # [py<37]
-  script: {{ PYTHON }} -m pip install . -vv
-  entry_points:
-    - diffusers-cli=diffusers.commands.diffusers_cli:main
 
-requirements:
-  host:
-    - pip
-    - python
-    - setuptools
-    - wheel
-  run:
-    - python
-    - filelock
-    - huggingface_hub >=0.10.0
-    - importlib-metadata
-    - numpy
-    - pillow <10.0
-    - regex !=2019.12.17
-    - requests
-    - pytorch >=1.4
+outputs:
+  - name: {{ name }}-base
+    script: build_base.sh  # [not win]
+    script: build_base.bat  # [win]
+    build:
+      skip: true  # [py<37]
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+      run:
+        - python
+        - filelock
+        - huggingface_hub >=0.10.0
+        - importlib-metadata
+        - numpy
+        - pillow <10.0
+        - regex !=2019.12.17
+        - requests
 
-test:
-  imports:
-    - diffusers
-    - diffusers.models
-  commands:
-    - pip check
-    - diffusers-cli --help
-  requires:
-    - pip
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
+
+  - name: diffusers-torch
+    script: build_base.sh  # [not win]
+    script: build_base.bat  # [win]
+    build:
+      skip: true  # [py<37]
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+      run:
+        - {{ pin_subpackage(name+'-base', exact=True) }}
+        - pytorch >=1.4
+        # - accelerate # TODO still needs built
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
+
+  - name: diffusers-flax
+    script: build_base.sh  # [not win]
+    build:
+      skip: true  # [win]
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+      run:
+        - {{ pin_subpackage(name+'-base', exact=True) }}
+        # TODO: None of these exist
+        - jax
+        - jaxlib
+        - flax
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
 
 about:
   home: https://github.com/huggingface/diffusers
