@@ -83,8 +83,8 @@ outputs:
         - wheel
       run:
         - {{ pin_subpackage(name+'-base', exact=True) }}
-        - jax
-        - jaxlib
+        - jax >=0.2.8,!=0.3.2
+        - jaxlib >=0.1.65
         - flax
     test:
       imports:
