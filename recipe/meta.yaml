@@ -12,14 +12,15 @@ source:
 
 build:
   number: 0
-  skip: true  # [py<37]
+  # accelerate not yet available on OSX or Windows
+  skip: true  # [py<37 or osx or win]
 
 outputs:
   - name: {{ name }}-base
     script: build_base.sh  # [not win]
     script: build_base.bat  # [win]
     build:
-      skip: true  # [py<37]
+      skip: true  # [py<37 or osx or win]
     requirements:
       host:
         - pip
