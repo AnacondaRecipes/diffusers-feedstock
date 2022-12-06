@@ -60,7 +60,7 @@ outputs:
       run:
         - {{ pin_subpackage(name+'-base', exact=True) }}
         - pytorch >=1.4
-        # - accelerate # TODO still needs built
+        - huggingface_accelerate
     test:
       imports:
         - diffusers
