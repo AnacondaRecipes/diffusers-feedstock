@@ -71,30 +71,31 @@ outputs:
       requires:
         - pip
 
-  - name: diffusers-flax
-    script: build_base.sh  # [not win]
-    build:
-      skip: true  # [win]
-    requirements:
-      host:
-        - pip
-        - python
-        - setuptools
-        - wheel
-      run:
-        - {{ pin_subpackage(name+'-base', exact=True) }}
-        - jax >=0.2.8,!=0.3.2
-        - jaxlib >=0.1.65
-        - flax
-    test:
-      imports:
-        - diffusers
-        - diffusers.models
-      commands:
-        - pip check
-        - diffusers-cli --help
-      requires:
-        - pip
+  ## TODO: Enable once the flax toolchain is flushed out. 
+  # - name: diffusers-flax
+  #   script: build_base.sh  # [not win]
+  #   build:
+  #     skip: true  # [win]
+  #   requirements:
+  #     host:
+  #       - pip
+  #       - python
+  #       - setuptools
+  #       - wheel
+  #     run:
+  #       - {{ pin_subpackage(name+'-base', exact=True) }}
+  #       - jax >=0.2.8,!=0.3.2
+  #       - jaxlib >=0.1.65
+  #       - flax
+  #   test:
+  #     imports:
+  #       - diffusers
+  #       - diffusers.models
+  #     commands:
+  #       - pip check
+  #       - diffusers-cli --help
+  #     requires:
+  #       - pip
 
   - name: diffusers
     script: build_base.sh  # [not win]
