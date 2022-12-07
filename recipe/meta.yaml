@@ -14,7 +14,6 @@ build:
   number: 0
   # accelerate not yet available on OSX or Windows
   skip: true  # [py<37 or osx or win]
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
 
 outputs:
   - name: {{ name }}-base
