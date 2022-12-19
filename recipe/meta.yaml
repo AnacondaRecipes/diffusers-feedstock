@@ -1,5 +1,5 @@
 {% set name = "diffusers" %}
-{% set version = "0.7.2" %}
+{% set version = "0.11.0" %}
 
 
 package:
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: fb814ffd150cc6f470380b8c6a521181a77beb2f44134d2aad2e4cd8aa2ced0e
+  sha256: 553978badef3bb95af7557679f037a3f01cc167e9991fd9618578d3971cd62f6
 
 build:
   number: 0
@@ -43,7 +43,7 @@ outputs:
         - huggingface_hub >=0.10.0
         - importlib-metadata
         - numpy
-        - pillow <10.0
+        - pillow
         - regex !=2019.12.17
         - requests
 
@@ -82,7 +82,7 @@ outputs:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
         - pytorch >=1.4
-        - huggingface_accelerate
+        - huggingface_accelerate >=0.11.0
     test:
       imports:
         - diffusers
