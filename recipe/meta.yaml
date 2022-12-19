@@ -21,12 +21,22 @@ outputs:
     script: build_base.bat  # [win]
     build:
       skip: true  # [py<37 or osx or win]
+      missing_dso_whitelist:
+        - /lib64/libc.so.6
+        - /lib64/libpthread.so.0
+        - /lib64/libgcc_s.so.1
+        - /lib64/libm.so.6
+        - $RPATH/libgfortran.so.5
+        - /lib64/librt.so.1
+        - $RPATH/libgomp.so.1
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
+        - pillow
+        - numpy
       run:
         - python
         - filelock
@@ -52,13 +62,24 @@ outputs:
     script: build_base.bat  # [win]
     build:
       skip: true  # [py<37]
+      missing_dso_whitelist:
+        - /lib64/libc.so.6
+        - /lib64/libpthread.so.0
+        - /lib64/libgcc_s.so.1
+        - /lib64/libm.so.6
+        - $RPATH/libgfortran.so.5
+        - /lib64/librt.so.1
+        - $RPATH/libgomp.so.1
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
+        - pillow
+        - numpy
       run:
+        - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
         - pytorch >=1.4
         - huggingface_accelerate
@@ -102,13 +123,24 @@ outputs:
     script: build_base.sh  # [not win]
     build:
       skip: true  # [win]
+      missing_dso_whitelist:
+        - /lib64/libc.so.6
+        - /lib64/libpthread.so.0
+        - /lib64/libgcc_s.so.1
+        - /lib64/libm.so.6
+        - $RPATH/libgfortran.so.5
+        - /lib64/librt.so.1
+        - $RPATH/libgomp.so.1
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
+        - pillow
+        - numpy
       run:
+        - python
         - {{ pin_subpackage(name+'-torch', exact=True) }}
     test:
       imports:
