@@ -1,49 +1,163 @@
 {% set name = "diffusers" %}
-{% set version = "0.7.2" %}
+{% set version = "0.11.0" %}
 
 
 package:
-  name: {{ name|lower }}
+  name: {{ name|lower }}-suite
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/diffusers-{{ version }}.tar.gz
-  sha256: fb814ffd150cc6f470380b8c6a521181a77beb2f44134d2aad2e4cd8aa2ced0e
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 553978badef3bb95af7557679f037a3f01cc167e9991fd9618578d3971cd62f6
 
 build:
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  # accelerate not yet available on OSX or Windows
+  skip: true  # [py<37 or osx or win]
 
-requirements:
-  host:
-    - pip
-    - python >=3.6
-  run:
-    - python >=3.6
-    - filelock
-    - huggingface_hub
-    - importlib-metadata
-    - numpy
-    - pillow
-    - regex !=2019.12.17
-    - requests
-    - pytorch >=1.4
+outputs:
+  - name: {{ name }}-base
+    script: build_base.sh  # [not win]
+    script: build_base.bat  # [win]
+    build:
+      skip: true  # [py<37 or osx or win]
+      missing_dso_whitelist:
+        - /lib64/libc.so.6
+        - /lib64/libpthread.so.0
+        - /lib64/libgcc_s.so.1
+        - /lib64/libm.so.6
+        - $RPATH/libgfortran.so.5
+        - /lib64/librt.so.1
+        - $RPATH/libgomp.so.1
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+        - pillow
+        - numpy
+      run:
+        - python
+        - filelock
+        - huggingface_hub >=0.10.0
+        - importlib-metadata
+        - numpy
+        - pillow
+        - regex !=2019.12.17
+        - requests
 
-test:
-  imports:
-    - diffusers
-    - diffusers.models
-  commands:
-    - pip check
-  requires:
-    - pip
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
+
+  - name: diffusers-torch
+    script: build_base.sh  # [not win]
+    script: build_base.bat  # [win]
+    build:
+      skip: true  # [py<37]
+      missing_dso_whitelist:
+        - /lib64/libc.so.6
+        - /lib64/libpthread.so.0
+        - /lib64/libgcc_s.so.1
+        - /lib64/libm.so.6
+        - $RPATH/libgfortran.so.5
+        - /lib64/librt.so.1
+        - $RPATH/libgomp.so.1
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+        - pillow
+        - numpy
+      run:
+        - python
+        - {{ pin_subpackage(name+'-base', exact=True) }}
+        - pytorch >=1.4
+        - huggingface_accelerate >=0.11.0
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
+
+  ## TODO: Enable once the flax toolchain is flushed out. 
+  # - name: diffusers-flax
+  #   script: build_base.sh  # [not win]
+  #   build:
+  #     skip: true  # [win]
+  #   requirements:
+  #     host:
+  #       - pip
+  #       - python
+  #       - setuptools
+  #       - wheel
+  #     run:
+  #       - {{ pin_subpackage(name+'-base', exact=True) }}
+  #       - jax >=0.2.8,!=0.3.2
+  #       - jaxlib >=0.1.65
+  #       - flax
+  #   test:
+  #     imports:
+  #       - diffusers
+  #       - diffusers.models
+  #     commands:
+  #       - pip check
+  #       - diffusers-cli --help
+  #     requires:
+  #       - pip
+
+  - name: diffusers
+    script: build_base.sh  # [not win]
+    build:
+      skip: true  # [win]
+      missing_dso_whitelist:
+        - /lib64/libc.so.6
+        - /lib64/libpthread.so.0
+        - /lib64/libgcc_s.so.1
+        - /lib64/libm.so.6
+        - $RPATH/libgfortran.so.5
+        - /lib64/librt.so.1
+        - $RPATH/libgomp.so.1
+    requirements:
+      host:
+        - pip
+        - python
+        - setuptools
+        - wheel
+        - pillow
+        - numpy
+      run:
+        - python
+        - {{ pin_subpackage(name+'-torch', exact=True) }}
+    test:
+      imports:
+        - diffusers
+        - diffusers.models
+      commands:
+        - pip check
+        - diffusers-cli --help
+      requires:
+        - pip
 
 about:
   home: https://github.com/huggingface/diffusers
-  summary: Diffusers
   license: Apache-2.0
   license_file: LICENSE
+  license_family: Apache
+  summary: Diffusers provides pretrained vision diffusion models, and serves as a modular toolbox for inference and training.
   description: |
     :hugs: Diffusers provides pretrained diffusion models across multiple modalities, 
     such as vision and audio, and serves as a modular toolbox for inference and 
@@ -51,7 +165,7 @@ about:
 
     PyPI: [https://pypi.org/project/diffusers/](https://pypi.org/project/diffusers/)
 
-  doc_url: https://github.com/huggingface/diffusers
+  doc_url: https://huggingface.co/docs/diffusers/index
   dev_url: https://github.com/huggingface/diffusers
 
 extra:
