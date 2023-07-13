@@ -13,14 +13,14 @@ source:
 build:
   number: 0
   # accelerate not yet available on OSX or Windows
-  skip: true  # [py<37 or osx or win]
+  skip: true  # [py<37]
 
 outputs:
   - name: {{ name }}-base
     script: build_base.sh  # [not win]
     script: build_base.bat  # [win]
     build:
-      skip: true  # [py<37 or osx or win]
+      skip: true  # [py<37]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
@@ -97,7 +97,7 @@ outputs:
   # - name: diffusers-flax
   #   script: build_base.sh  # [not win]
   #   build:
-  #     skip: true  # [win]
+  #     skip: true  # [win or ppc64le or s390x]
   #   requirements:
   #     host:
   #       - pip
@@ -121,8 +121,8 @@ outputs:
 
   - name: diffusers
     script: build_base.sh  # [not win]
+    script: build_base.bat  # [win]
     build:
-      skip: true  # [win]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
