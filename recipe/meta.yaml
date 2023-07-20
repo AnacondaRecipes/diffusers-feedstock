@@ -12,8 +12,8 @@ source:
 
 build:
   number: 0
-  # accelerate not yet available on OSX or Windows
   skip: true  # [py<37]
+  skip: true  # [py>310 and ppc64le]
 
 outputs:
   - name: {{ name }}-base
