@@ -58,8 +58,6 @@ outputs:
         - pip
 
   - name: diffusers-torch
-    script: build_base.sh  # [not win]
-    script: build_base.bat  # [win]
     build:
       skip: true  # [py<37]
       skip: true  # [py>310 and ppc64le]
@@ -120,8 +118,6 @@ outputs:
   #       - pip
 
   - name: diffusers
-    script: build_base.sh  # [not win]
-    script: build_base.bat  # [win]
     build:
       skip: true  # [py>310 and ppc64le]
       missing_dso_whitelist:
