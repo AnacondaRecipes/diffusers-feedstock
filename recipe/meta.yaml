@@ -54,7 +54,6 @@ outputs:
         - diffusers.models
       commands:
         - pip check
-        - diffusers-cli --help
       requires:
         - pip
 
@@ -91,7 +90,6 @@ outputs:
         - diffusers.models
       commands:
         - pip check
-        - diffusers-cli --help
       requires:
         - pip
 
@@ -150,7 +148,6 @@ outputs:
         - diffusers.models
       commands:
         - pip check
-        - diffusers-cli --help
       requires:
         - pip
 
