@@ -123,6 +123,7 @@ outputs:
     script: build_base.sh  # [not win]
     script: build_base.bat  # [win]
     build:
+      skip: true  # [py>310 and ppc64le]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
