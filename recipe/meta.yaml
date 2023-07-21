@@ -13,6 +13,7 @@ source:
 build:
   number: 0
   skip: true  # [py<37]
+  # pytorch is not built for python 3.11 on ppc64le
   skip: true  # [py>310 and ppc64le]
 
 requirements:
