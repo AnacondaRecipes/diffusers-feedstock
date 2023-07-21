@@ -15,6 +15,15 @@ build:
   skip: true  # [py<37]
   skip: true  # [py>310 and ppc64le]
 
+requirements:
+  host:
+    - pip
+    - python
+    - setuptools
+    - wheel
+    - pillow
+    - numpy
+
 outputs:
   - name: {{ name }}-base
     script: build_base.sh  # [not win]
