@@ -29,9 +29,9 @@ outputs:
   - name: {{ name }}-base
     script: build_base.sh  # [not win]
     script: build_base.bat  # [win]
-    entry-points:
-      - diffusers-cli=diffusers.commands.diffusers_cli:main
     build:
+      entry_points:
+        - diffusers-cli=diffusers.commands.diffusers_cli:main
       skip: true  # [py<37]
       # pytorch is not built for python 3.11 on ppc64le
       skip: true  # [py>310 and ppc64le]
