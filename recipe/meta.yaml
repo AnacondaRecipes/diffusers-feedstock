@@ -1,5 +1,5 @@
 {% set name = "diffusers" %}
-{% set version = "0.11.0" %}
+{% set version = "0.18.2" %}
 
 
 package:
@@ -8,19 +8,33 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 553978badef3bb95af7557679f037a3f01cc167e9991fd9618578d3971cd62f6
+  sha256: 49a8375d72ba27efe7414a9ccc3ad5f969a13838bd089ad985ab836d03ffb8a4
 
 build:
   number: 0
-  # accelerate not yet available on OSX or Windows
-  skip: true  # [py<37 or osx or win]
+  skip: true  # [py<37]
+  # pytorch is not built for python 3.11 on ppc64le
+  skip: true  # [py>310 and ppc64le]
+
+requirements:
+  host:
+    - pip
+    - python
+    - setuptools
+    - wheel
+    - pillow
+    - numpy
 
 outputs:
   - name: {{ name }}-base
     script: build_base.sh  # [not win]
     script: build_base.bat  # [win]
     build:
-      skip: true  # [py<37 or osx or win]
+      entry_points:
+        - diffusers-cli=diffusers.commands.diffusers_cli:main
+      skip: true  # [py<37]
+      # pytorch is not built for python 3.11 on ppc64le
+      skip: true  # [py>310 and ppc64le]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
@@ -40,7 +54,7 @@ outputs:
       run:
         - python
         - filelock
-        - huggingface_hub >=0.10.0
+        - huggingface_hub >=0.13.2
         - importlib-metadata
         - numpy
         - pillow
@@ -58,10 +72,10 @@ outputs:
         - pip
 
   - name: diffusers-torch
-    script: build_base.sh  # [not win]
-    script: build_base.bat  # [win]
     build:
       skip: true  # [py<37]
+      # pytorch is not built for python 3.11 on ppc64le
+      skip: true  # [py>310 and ppc64le]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
@@ -97,7 +111,7 @@ outputs:
   # - name: diffusers-flax
   #   script: build_base.sh  # [not win]
   #   build:
-  #     skip: true  # [win]
+  #     skip: true  # [win or ppc64le or s390x]
   #   requirements:
   #     host:
   #       - pip
@@ -120,9 +134,9 @@ outputs:
   #       - pip
 
   - name: diffusers
-    script: build_base.sh  # [not win]
     build:
-      skip: true  # [win]
+      # pytorch is not built for python 3.11 on ppc64le
+      skip: true  # [py>310 and ppc64le]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
