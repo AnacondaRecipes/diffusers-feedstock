@@ -1,5 +1,5 @@
 {% set name = "diffusers" %}
-{% set version = "0.18.2" %}
+{% set version = "0.30.3" %}
 
 
 package:
@@ -8,13 +8,11 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 49a8375d72ba27efe7414a9ccc3ad5f969a13838bd089ad985ab836d03ffb8a4
+  sha256: 67c5eb25d5b50bf0742624ef43fe0f6d1e1604f64aad3e8558469cbe89ecf72f
 
 build:
   number: 0
-  skip: true  # [py<37]
-  # pytorch is not built for python 3.11 on ppc64le
-  skip: true  # [py>310 and ppc64le]
+  skip: true  # [py<38]
 
 requirements:
   host:
@@ -23,7 +21,7 @@ requirements:
     - setuptools
     - wheel
     - pillow
-    - numpy
+    - numpy {{ numpy }}
 
 outputs:
   - name: {{ name }}-base
@@ -32,9 +30,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<37]
-      # pytorch is not built for python 3.11 on ppc64le
-      skip: true  # [py>310 and ppc64le]
+      skip: true  # [py<38]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
@@ -50,16 +46,17 @@ outputs:
         - setuptools
         - wheel
         - pillow
-        - numpy
+        - numpy {{ numpy }}
       run:
         - python
         - filelock
-        - huggingface_hub >=0.13.2
+        - huggingface_hub >=0.23.2
         - importlib-metadata
         - numpy
         - pillow
         - regex !=2019.12.17
         - requests
+        - safetensors >=0.3.1
 
     test:
       imports:
@@ -67,15 +64,12 @@ outputs:
         - diffusers.models
       commands:
         - pip check
-        - diffusers-cli --help
       requires:
         - pip
 
   - name: diffusers-torch
     build:
-      skip: true  # [py<37]
-      # pytorch is not built for python 3.11 on ppc64le
-      skip: true  # [py>310 and ppc64le]
+      skip: true  # [py<38]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
@@ -91,23 +85,25 @@ outputs:
         - setuptools
         - wheel
         - pillow
-        - numpy
+        - numpy {{ numpy }}
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
         - pytorch >=1.4
-        - huggingface_accelerate >=0.11.0
+        - huggingface_accelerate >=0.31.0
     test:
       imports:
         - diffusers
         - diffusers.models
       commands:
         - pip check
+        # the diffusers-cli command requires pytorch at runtime,
+        # https://github.com/huggingface/diffusers/blob/main/src/diffusers/commands/fp16_safetensors.py#L27
         - diffusers-cli --help
       requires:
         - pip
 
-  ## TODO: Enable once the flax toolchain is flushed out. 
+  ## TODO: Enable once the flax toolchain is flushed out.
   # - name: diffusers-flax
   #   script: build_base.sh  # [not win]
   #   build:
@@ -135,8 +131,7 @@ outputs:
 
   - name: diffusers
     build:
-      # pytorch is not built for python 3.11 on ppc64le
-      skip: true  # [py>310 and ppc64le]
+      skip: true  # [py<38]
       missing_dso_whitelist:
         - /lib64/libc.so.6
         - /lib64/libpthread.so.0
@@ -152,7 +147,7 @@ outputs:
         - setuptools
         - wheel
         - pillow
-        - numpy
+        - numpy {{ numpy }}
       run:
         - python
         - {{ pin_subpackage(name+'-torch', exact=True) }}
@@ -173,8 +168,8 @@ about:
   license_family: Apache
   summary: Diffusers provides pretrained vision diffusion models, and serves as a modular toolbox for inference and training.
   description: |
-    :hugs: Diffusers provides pretrained diffusion models across multiple modalities, 
-    such as vision and audio, and serves as a modular toolbox for inference and 
+    :hugs: Diffusers provides pretrained diffusion models across multiple modalities,
+    such as vision and audio, and serves as a modular toolbox for inference and
     training of diffusion models.
 
     PyPI: [https://pypi.org/project/diffusers/](https://pypi.org/project/diffusers/)
