@@ -12,8 +12,7 @@ source:
 
 build:
   number: 0
-  # s390x is missing safetensors for 0.4.4 and huggingface_accelerate 0.33.0
-  skip: true  # [py<38 or s390x]
+  skip: true  # [py<38]
 
 requirements:
   host:
