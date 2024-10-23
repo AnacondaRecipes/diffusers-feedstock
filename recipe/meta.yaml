@@ -14,15 +14,6 @@ build:
   number: 0
   skip: true  # [py<38]
 
-requirements:
-  host:
-    - pip
-    - python
-    - setuptools
-    - wheel
-    - pillow
-    - numpy {{ numpy }}
-
 outputs:
   - name: {{ name }}-base
     script: build_base.sh  # [not win]
@@ -31,22 +22,12 @@ outputs:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
       skip: true  # [py<38]
-      missing_dso_whitelist:
-        - /lib64/libc.so.6
-        - /lib64/libpthread.so.0
-        - /lib64/libgcc_s.so.1
-        - /lib64/libm.so.6
-        - $RPATH/libgfortran.so.5
-        - /lib64/librt.so.1
-        - $RPATH/libgomp.so.1
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
-        - pillow
-        - numpy {{ numpy }}
       run:
         - python
         - filelock
@@ -57,6 +38,11 @@ outputs:
         - regex !=2019.12.17
         - requests
         - safetensors >=0.3.1
+      run_constrained:
+        - huggingface_accelerate >=0.31.0
+        - protobuf >=3.20.3,<4
+        - peft >=0.6.0
+        - pytorch >=1.4
 
     test:
       imports:
@@ -70,22 +56,12 @@ outputs:
   - name: diffusers-torch
     build:
       skip: true  # [py<38]
-      missing_dso_whitelist:
-        - /lib64/libc.so.6
-        - /lib64/libpthread.so.0
-        - /lib64/libgcc_s.so.1
-        - /lib64/libm.so.6
-        - $RPATH/libgfortran.so.5
-        - /lib64/librt.so.1
-        - $RPATH/libgomp.so.1
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
-        - pillow
-        - numpy {{ numpy }}
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
@@ -132,22 +108,12 @@ outputs:
   - name: diffusers
     build:
       skip: true  # [py<38]
-      missing_dso_whitelist:
-        - /lib64/libc.so.6
-        - /lib64/libpthread.so.0
-        - /lib64/libgcc_s.so.1
-        - /lib64/libm.so.6
-        - $RPATH/libgfortran.so.5
-        - /lib64/librt.so.1
-        - $RPATH/libgomp.so.1
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
-        - pillow
-        - numpy {{ numpy }}
       run:
         - python
         - {{ pin_subpackage(name+'-torch', exact=True) }}
