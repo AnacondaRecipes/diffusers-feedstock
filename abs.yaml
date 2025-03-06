@@ -4,3 +4,4 @@ build_env_vars:
 channels:
   - https://staging.continuum.io/prefect/fs/safetensors-feedstock/pr9/c8e46a9
   - https://staging.continuum.io/prefect/fs/huggingface_hub-feedstock/pr9/8468f66
+  - https://staging.continuum.io/prefect/fs/accelerate-feedstock/pr7/4b4512f
