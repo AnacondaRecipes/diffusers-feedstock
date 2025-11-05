@@ -29,18 +29,18 @@ outputs:
         - wheel
       run:
         - python
-        - filelock
-        - huggingface_hub >=0.23.2
         - importlib-metadata
+        - filelock
+        - huggingface_hub >=0.34.0
         - numpy
-        - pillow
         - regex !=2019.12.17
         - requests
         - safetensors >=0.3.1
+        - pillow
       run_constrained:
         - huggingface_accelerate >=0.31.0
         - protobuf >=3.20.3,<4
-        - peft >=0.6.0
+        - peft >=0.17.0
         - pytorch >=1.4
     test:
       imports:
@@ -79,7 +79,7 @@ outputs:
   # - name: diffusers-flax
   #   script: build_base.sh  # [not win]
   #   build:
-  #     skip: true  # [win or ppc64le or s390x]
+  #     skip: true  # [win]
   #   requirements:
   #     host:
   #       - pip
