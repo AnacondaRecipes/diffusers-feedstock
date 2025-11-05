@@ -59,6 +59,7 @@ outputs:
         - python
         - setuptools
         - wheel
+        - pytorch {{ pytorch }}
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
