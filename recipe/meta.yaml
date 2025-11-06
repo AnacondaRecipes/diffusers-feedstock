@@ -1,14 +1,13 @@
 {% set name = "diffusers" %}
-{% set version = "0.32.2" %}
-
+{% set version = "0.35.2" %}
 
 package:
   name: {{ name|lower }}-suite
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: eb1e36b326aabb0675729af7c626caf7a76ce7ced3a126e879331790b1eaa230
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 30ecd552303edfcfe1724573c3918a8462ee3ab4d529bdbd4c0045f763affded
 
 build:
   number: 0
@@ -30,20 +29,19 @@ outputs:
         - wheel
       run:
         - python
-        - filelock
-        - huggingface_hub >=0.23.2
         - importlib-metadata
+        - filelock
+        - huggingface_hub >=0.34.0
         - numpy
-        - pillow
         - regex !=2019.12.17
         - requests
         - safetensors >=0.3.1
+        - pillow
       run_constrained:
         - huggingface_accelerate >=0.31.0
         - protobuf >=3.20.3,<4
-        - peft >=0.6.0
+        - peft >=0.17.0
         - pytorch >=1.4
-
     test:
       imports:
         - diffusers
@@ -52,7 +50,6 @@ outputs:
         - pip check
       requires:
         - pip
-
   - name: diffusers-torch
     build:
       skip: true  # [py<38]
@@ -62,6 +59,7 @@ outputs:
         - python
         - setuptools
         - wheel
+        - pytorch {{ pytorch }}
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
@@ -78,12 +76,11 @@ outputs:
         - diffusers-cli --help
       requires:
         - pip
-
   ## TODO: Enable once the flax toolchain is flushed out.
   # - name: diffusers-flax
   #   script: build_base.sh  # [not win]
   #   build:
-  #     skip: true  # [win or ppc64le or s390x]
+  #     skip: true  # [win]
   #   requirements:
   #     host:
   #       - pip
@@ -104,7 +101,6 @@ outputs:
   #       - diffusers-cli --help
   #     requires:
   #       - pip
-
   - name: diffusers
     build:
       skip: true  # [py<38]
