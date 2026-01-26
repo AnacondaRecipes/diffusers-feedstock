@@ -10,7 +10,7 @@ source:
   sha256: 30ecd552303edfcfe1724573c3918a8462ee3ab4d529bdbd4c0045f763affded
 
 build:
-  number: 0
+  number: 1
   skip: true  # [py<38]
 
 outputs:
@@ -39,7 +39,6 @@ outputs:
         - pillow
       run_constrained:
         - huggingface_accelerate >=0.31.0
-        - protobuf >=3.20.3,<4
         - peft >=0.17.0
         - pytorch >=1.4
     test:
