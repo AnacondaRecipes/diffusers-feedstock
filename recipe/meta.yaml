@@ -60,7 +60,7 @@ outputs:
         - python
         - setuptools
         - wheel
-        - pytorch 2.9.1
+        - pytorch {{ pytorch }}
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
