@@ -15,7 +15,7 @@ build:
 
 outputs:
   - name: {{ name }}-base
-    script: build_base.sh  # [not win]
+    script: build_base.sh  # [unix]
     script: build_base.bat  # [win]
     build:
       entry_points:
@@ -79,7 +79,7 @@ outputs:
         - pip
   ## TODO: Enable once the flax toolchain is flushed out.
   # - name: diffusers-flax
-  #   script: build_base.sh  # [not win]
+  #   script: build_base.sh  # [unix]
   #   build:
   #     skip: true  # [win]
   #   requirements:
