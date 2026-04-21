@@ -1,4 +1,4 @@
-{% set name = "diffusers" %}
+{% set name = "diffusers-suite" %}
 {% set version = "0.37.1" %}
 
 package:
