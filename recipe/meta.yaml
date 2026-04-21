@@ -9,9 +9,11 @@ source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 2346c21f77f835f273b7aacbaada1c34a596a3a2cc6ddc99d149efcd0ec298fa
 
+# Skip Python 3.14+ until PyTorch (required in diffusers-torch host) and the rest of
+# the pinned stack publish cp314 builds on our target platforms/channels.
 build:
   number: 0
-  skip: true  # [py<310]
+  skip: true  # [py<310 or py>=314]
 
 outputs:
   - name: {{ name }}-base
@@ -20,7 +22,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<310]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
@@ -53,7 +55,7 @@ outputs:
         - pip
   - name: diffusers-torch
     build:
-      skip: true  # [py<310]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
@@ -104,7 +106,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<310]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
