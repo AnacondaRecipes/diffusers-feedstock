@@ -11,8 +11,7 @@ source:
 
 build:
   number: 0
-  # Skip 3.14+ until PyTorch (and friends) publish cp314 builds; adjust py>313 when ready.
-  skip: true  # [py<310 or py>313]
+  skip: true  # [py<310]
 
 outputs:
   - name: {{ name }}-base
@@ -21,7 +20,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<310 or py>313]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
@@ -54,7 +53,7 @@ outputs:
         - pip
   - name: diffusers-torch
     build:
-      skip: true  # [py<310 or py>313]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
@@ -105,7 +104,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<310 or py>313]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
