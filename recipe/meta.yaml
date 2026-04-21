@@ -22,7 +22,7 @@ outputs:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
       skip: true  # [py<310]
-      skip: true  # [py>=314]
+      skip: true  # [py>313]
     requirements:
       host:
         - pip
@@ -56,7 +56,7 @@ outputs:
   - name: diffusers-torch
     build:
       skip: true  # [py<310]
-      skip: true  # [py>=314]
+      skip: true  # [py>313]
     requirements:
       host:
         - pip
@@ -108,7 +108,7 @@ outputs:
   - name: diffusers
     build:
       skip: true  # [py<310]
-      skip: true  # [py>=314]
+      skip: true  # [py>313]
     requirements:
       host:
         - pip
