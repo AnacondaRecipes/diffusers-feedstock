@@ -11,8 +11,6 @@ source:
 
 build:
   number: 0
-  skip: true  # [py<310]
-  skip: true  # [py>=314]
 
 outputs:
   - name: {{ name }}-base
@@ -21,8 +19,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<310]
-      skip: true  # [py>313]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
@@ -55,8 +52,7 @@ outputs:
         - pip
   - name: diffusers-torch
     build:
-      skip: true  # [py<310]
-      skip: true  # [py>313]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
@@ -107,8 +103,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<310]
-      skip: true  # [py>313]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
