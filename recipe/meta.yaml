@@ -1,5 +1,5 @@
 {% set name = "diffusers" %}
-{% set version = "0.36.0" %}
+{% set version = "0.37.1" %}
 
 package:
   name: {{ name|lower }}-suite
@@ -7,11 +7,11 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: a9cde8721b415bde6a678f2d02abb85396487e1b0e0d2b4abb462d14a9825ab0
+  sha256: 2346c21f77f835f273b7aacbaada1c34a596a3a2cc6ddc99d149efcd0ec298fa
 
 build:
   number: 0
-  skip: true  # [py<38]
+  skip: true  # [py<310]
 
 outputs:
   - name: {{ name }}-base
@@ -20,7 +20,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<38]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
@@ -53,14 +53,14 @@ outputs:
         - pip
   - name: diffusers-torch
     build:
-      skip: true  # [py<38]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
-        - pytorch {{ pytorch }}
+        - pytorch 2.9.1
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
@@ -104,7 +104,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<38]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
