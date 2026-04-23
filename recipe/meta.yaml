@@ -1,26 +1,31 @@
 {% set name = "diffusers" %}
-{% set version = "0.36.0" %}
+{% set version = "0.37.1" %}
 
 package:
   name: {{ name|lower }}-suite
   version: {{ version }}
 
+# Build and ship from the PyPI sdist (canonical packaging layout). A second source from
+# GitHub is merged only to supply upstream tests/ for the feedstock test phase (sdists omit most tests).
 source:
-  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: a9cde8721b415bde6a678f2d02abb85396487e1b0e0d2b4abb462d14a9825ab0
+  - url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+    sha256: 2346c21f77f835f273b7aacbaada1c34a596a3a2cc6ddc99d149efcd0ec298fa
+  - url: https://github.com/huggingface/diffusers/archive/refs/tags/v{{ version }}.tar.gz
+    sha256: 374cae5ae915b5d42dca98cbf57c993a8f1916a90e184e9c34c8cbe937104313
+    folder: upstream-github
 
 build:
   number: 0
-  skip: true  # [py<38]
 
 outputs:
   - name: {{ name }}-base
-    script: build_base.sh  # [not win]
+    # File scripts only (conda-build copies script into work/); same as inline pip install from PyPI root.
+    script: build_base.sh  # [unix]
     script: build_base.bat  # [win]
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<38]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
@@ -44,16 +49,32 @@ outputs:
         - peft >=0.17.0
         - pytorch >=1.4
     test:
+      # Upstream tests live only on the GitHub merge (hoisted to upstream-github/tests/). This
+      # output is packaged before work/ is torn down, so test/source_files globs succeed here
+      # (they fail on later outputs such as diffusers-torch).
+      source_files:
+        - upstream-github/tests/__init__.py
+        - upstream-github/tests/conftest.py
+        - upstream-github/tests/testing_utils.py
+        - upstream-github/tests/models/__init__.py
+        - upstream-github/tests/models/test_activations.py
+        - upstream-github/tests/models/test_layers_utils.py
       imports:
         - diffusers
         - diffusers.models
       commands:
         - pip check
+        - bash -c 'export DIFFUSERS_TEST_DEVICE=cpu && cd "$SRC_DIR/upstream-github" && python -m pytest tests/models/test_activations.py tests/models/test_layers_utils.py -q --tb=short'  # [unix]
+        - set DIFFUSERS_TEST_DEVICE=cpu&& cd /d "%SRC_DIR%\upstream-github"&& python -m pytest tests/models/test_activations.py tests/models/test_layers_utils.py -q --tb=short  # [win]
       requires:
         - pip
+        - pytest
+        - packaging
+        - pytorch {{ pytorch }}
+        - huggingface_accelerate >=0.31.0
   - name: diffusers-torch
     build:
-      skip: true  # [py<38]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
@@ -79,7 +100,7 @@ outputs:
         - pip
   ## TODO: Enable once the flax toolchain is flushed out.
   # - name: diffusers-flax
-  #   script: build_base.sh  # [not win]
+  #   script: build_base.sh  # [unix]
   #   build:
   #     skip: true  # [win]
   #   requirements:
@@ -104,7 +125,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<38]
+      skip: true  # [py<310 or py>=314]
     requirements:
       host:
         - pip
