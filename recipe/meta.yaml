@@ -6,17 +6,20 @@ package:
   version: {{ version }}
 
 source:
-  # PyPI sdists omit almost all of upstream tests/; the GitHub release archive matches the same tag and ships the full suite.
-  url: https://github.com/huggingface/diffusers/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 374cae5ae915b5d42dca98cbf57c993a8f1916a90e184e9c34c8cbe937104313
+  - url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+    sha256: a9cde8721b415bde6a678f2d02abb85396487e1b0e0d2b4abb462d14a9825ab0
+    folder: source
+    # PyPI sdists omit almost all of upstream tests/; the GitHub release archive matches the same tag and ships the full suite.
+  - url: https://github.com/huggingface/diffusers/archive/refs/tags/v{{ version }}.tar.gz
+    sha256: 374cae5ae915b5d42dca98cbf57c993a8f1916a90e184e9c34c8cbe937104313
+    folder: tests
 
 build:
   number: 0
 
 outputs:
   - name: {{ name }}-base
-    script: build_base.sh  # [unix]
-    script: build_base.bat  # [win]
+    script: {{ PYTHON }} -m pip install source -vv --no-deps --no-build-isolation
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
