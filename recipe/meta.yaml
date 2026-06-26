@@ -70,22 +70,29 @@ outputs:
         - pip
         - pytest
         - packaging
-        - pytorch 2.12.0  # hardpin 2.12 (CBC still 2.11); diffusers-torch run_export must allow torchao/xformers' pytorch 2.12
+        - pytorch >=2.12
         - huggingface_accelerate >=0.31.0
   - name: diffusers-torch
     build:
       skip: true  # [py<310]
+      # diffusers is pure-Python (imports torch at runtime, not ABI-linked), so don't
+      # inherit pytorch's tight version run_export — it would force a diffusers rebuild
+      # and re-trigger resolution conflicts on every pytorch bump.
+      ignore_run_exports_from:
+        - pytorch
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
-        - pytorch 2.12.0  # hardpin 2.12 (CBC still 2.11); diffusers-torch run_export must allow torchao/xformers' pytorch 2.12
+        - pytorch >=2.12
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
-        - pytorch >=1.4
+        # Loose floor (pytorch run_export suppressed above): stays compatible with
+        # pytorch 2.12 (torchao/xformers) and future pytorch without a diffusers rebuild.
+        - pytorch >=2.12
         - huggingface_accelerate >=0.31.0
     test:
       imports:
