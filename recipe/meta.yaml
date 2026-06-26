@@ -15,7 +15,7 @@ source:
     folder: upstream-github
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - name: {{ name }}-base
@@ -25,7 +25,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<310 or py>=314]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
@@ -70,18 +70,18 @@ outputs:
         - pip
         - pytest
         - packaging
-        - pytorch {{ pytorch }}
+        - pytorch 2.12.0  # hardpin 2.12 (CBC still 2.11); diffusers-torch run_export must allow torchao/xformers' pytorch 2.12
         - huggingface_accelerate >=0.31.0
   - name: diffusers-torch
     build:
-      skip: true  # [py<310 or py>=314]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
-        - pytorch {{ pytorch }}
+        - pytorch 2.12.0  # hardpin 2.12 (CBC still 2.11); diffusers-torch run_export must allow torchao/xformers' pytorch 2.12
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
@@ -125,7 +125,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<310 or py>=314]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
