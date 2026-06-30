@@ -15,7 +15,7 @@ source:
     folder: upstream-github
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - name: {{ name }}-base
@@ -25,7 +25,7 @@ outputs:
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<310 or py>=314]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
@@ -74,13 +74,16 @@ outputs:
         - huggingface_accelerate >=0.31.0
   - name: diffusers-torch
     build:
-      skip: true  # [py<310 or py>=314]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
         - python
         - setuptools
         - wheel
+        # Build against the CBC pytorch (2.12) so pytorch's run_export version-pins
+        # diffusers-torch to >=2.12,<2.13, in lockstep with the rest of the torch stack.
+        # AR rebuilds against the CBC pytorch each migration (users get tested combos).
         - pytorch {{ pytorch }}
       run:
         - python
@@ -125,7 +128,7 @@ outputs:
   #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<310 or py>=314]
+      skip: true  # [py<310]
     requirements:
       host:
         - pip
