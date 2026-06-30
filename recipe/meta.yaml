@@ -70,7 +70,7 @@ outputs:
         - pip
         - pytest
         - packaging
-        - pytorch 2.12.0
+        - pytorch {{ pytorch }}
         - huggingface_accelerate >=0.31.0
   - name: diffusers-torch
     build:
@@ -81,11 +81,10 @@ outputs:
         - python
         - setuptools
         - wheel
-        # Build against pytorch 2.12 (CBC still pins 2.11) so pytorch's run_export
-        # version-pins diffusers-torch to >=2.12,<2.13 — keeps it in lockstep with the
-        # torchao/xformers/unsloth_zoo 2.12 stack. AR owns the rebuild on each pytorch
-        # bump (controlled migration) rather than shipping untested combos to users.
-        - pytorch 2.12.0
+        # Build against the CBC pytorch (2.12) so pytorch's run_export version-pins
+        # diffusers-torch to >=2.12,<2.13, in lockstep with the rest of the torch stack.
+        # AR rebuilds against the CBC pytorch each migration (users get tested combos).
+        - pytorch {{ pytorch }}
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
