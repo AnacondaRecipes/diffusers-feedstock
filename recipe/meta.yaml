@@ -15,7 +15,7 @@ source:
     folder: upstream-github
 
 build:
-  number: 1
+  number: 2
 
 outputs:
   - name: {{ name }}-base
@@ -45,7 +45,10 @@ outputs:
         - pillow
       run_constrained:
         - huggingface_accelerate >=0.31.0
-        - protobuf >=3.20.3,<4
+        # drop stale <4 cap: pytorch 2.12 needs libprotobuf 6.x, and protobuf on
+        # pkgs/main is 4.25-6.33 (the <4 cap made diffusers unsatisfiable alongside
+        # modern pytorch/unsloth_zoo). Supersedes the change in diffusers#6.
+        - protobuf >=3.20.3
         - peft >=0.17.0
         - pytorch >=1.4
     test:
