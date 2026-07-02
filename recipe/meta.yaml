@@ -15,7 +15,7 @@ source:
     folder: upstream-github
 
 build:
-  number: 1
+  number: 2
 
 outputs:
   - name: {{ name }}-base
@@ -45,7 +45,12 @@ outputs:
         - pillow
       run_constrained:
         - huggingface_accelerate >=0.31.0
-        - protobuf >=3.20.3,<4
+        # Deliberately relax past upstream's dev/test/training-extras pin (protobuf<4):
+        # the AR pytorch 2.12 stack needs libprotobuf 6.x (protobuf is 4.25-6.33 on
+        # pkgs/main), so the <4 cap made diffusers unsatisfiable alongside pytorch/
+        # unsloth_zoo. protobuf is optional (extras-only) upstream, so run_constrained +
+        # a floor is sufficient. Supersedes diffusers#6.
+        - protobuf >=3.20.3
         - peft >=0.17.0
         - pytorch >=1.4
     test:
