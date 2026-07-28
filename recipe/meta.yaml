@@ -1,12 +1,12 @@
 {% set name = "diffusers" %}
 {% set version = "0.39.0" %}
 
-# Build and ship from the PyPI sdist (canonical packaging layout). A second source from
-# GitHub is merged only to supply upstream tests/ for the feedstock test phase (sdists omit most tests).
 package:
   name: {{ name|lower }}-suite
   version: {{ version }}
 
+# Build and ship from the PyPI sdist (canonical packaging layout). A second source from
+# GitHub is merged only to supply upstream tests/ for the feedstock test phase (sdists omit most tests).
 source:
   - url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
     sha256: 14bb1d98c85a0e463d734c99aaa73b480a7bc9bad22af30fbf730ef8f09c1d67
@@ -48,7 +48,7 @@ outputs:
         - numpy
         - regex !=2019.12.17
         - requests
-        - safetensors >=0.3.1
+        - safetensors >=0.8.0
         - pillow
       run_constrained:
         - huggingface_accelerate >=0.31.0
@@ -59,7 +59,7 @@ outputs:
         # a floor is sufficient. Supersedes diffusers#6.
         - protobuf >=3.20.3
         - peft >=0.17.0
-        - pytorch >=1.4
+        - pytorch >=2.6
     test:
       # Upstream tests live only on the GitHub merge (hoisted to upstream-github/tests/). This
       # output is packaged before work/ is torn down, so test/source_files globs succeed here
@@ -101,7 +101,7 @@ outputs:
       run:
         - python
         - {{ pin_subpackage(name+'-base', exact=True) }}
-        - pytorch >=1.4
+        - pytorch >=2.6
         - huggingface_accelerate >=0.31.0
     test:
       imports:
