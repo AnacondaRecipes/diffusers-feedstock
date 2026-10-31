@@ -1,17 +1,17 @@
 {% set name = "diffusers" %}
-{% set version = "0.39.0" %}
+{% set version = "0.42.1" %}
 
 package:
-  name: {{ name|lower }}-suite
+  name: {{ name }}-suite
   version: {{ version }}
 
 # Build and ship from the PyPI sdist (canonical packaging layout). A second source from
 # GitHub is merged only to supply upstream tests/ for the feedstock test phase (sdists omit most tests).
 source:
   - url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-    sha256: 14bb1d98c85a0e463d734c99aaa73b480a7bc9bad22af30fbf730ef8f09c1d67
-  - url: https://github.com/huggingface/diffusers/archive/refs/tags/v{{ version }}.tar.gz
-    sha256: 2dce0729c7438cff5f92fa4bea1ff5698efbe473e460c753cd419dfbc1563ffe
+    sha256: ce855ab670c8cd1c7a61be8f12fbc68c081bca8ec5e747273946d8d6c2aff23b
+  - url: https://github.com/huggingface/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
+    sha256: f1b2c0ddfb114c544b8a60d2fe2b14937fd9428620d4fe14081991a9ee3ad549
     folder: upstream-github
 
 build:
@@ -20,46 +20,51 @@ build:
 outputs:
   - name: {{ name }}-base
     # File scripts only (conda-build copies script into work/); same as inline pip install from PyPI root.
-    script: build_base.sh  # [unix]
-    script: build_base.bat  # [win]
+    script: build_base.{{ "bat" if win else "sh" }}
     build:
       entry_points:
         - diffusers-cli=diffusers.commands.diffusers_cli:main
-      skip: true  # [py<310]
-      # torch{{ pytorch }} MUST appear in the build string. Without it this output
-      # does not "use" the pytorch variant variable, so conda-build collapses the
-      # two torch variants into a single package -- which then exact-pins one torch
-      # line and strands the other (that is what broke bn3: the meta pinned only
-      # the torch-2.12 diffusers-torch). py{{ CONDA_PY }} must stay too: a manual
-      # string overrides conda-build's default py-prefix.
+      # upstream requires-python >=3.11. py3.15: run dep safetensors >=0.8.0 has
+      # no py3.15 build on pkgs/main yet; lift the py>314 cap once it does.
+      skip: true  # [py<311 or py>314]
+      # torch{{ pytorch }} MUST stay in the build string: otherwise conda-build treats
+      # pytorch as unused here, collapses the torch variants into one package, and the
+      # exact pins strand the other torch line (broke bn3). py{{ CONDA_PY }} must stay
+      # too: a manual string overrides conda-build's default py-prefix.
       string: py{{ CONDA_PY }}_torch{{ pytorch | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
     requirements:
       host:
         - pip
         - python
         - setuptools
-        - wheel
       run:
         - python
         - importlib-metadata
         - filelock
-        - httpx <1.0.0
-        - huggingface_hub >=0.34.0,<2.0
+        - huggingface_hub >=1.32.0,<3.0
         - numpy
         - regex !=2019.12.17
         - requests
         - safetensors >=0.8.0
         - pillow
+      # Bounded feature extras from setup.py (torch, training, bitsandbytes, gguf,
+      # optimum_quanto, torchao, nvidia_modelopt, sdnq). Unbounded extras are no-ops
+      # here; quality/docs/test/dev are dev-only.
       run_constrained:
         - huggingface_accelerate >=0.31.0
-        # Deliberately relax past upstream's dev/test/training-extras pin (protobuf<4):
-        # the AR pytorch 2.12 stack needs libprotobuf 6.x (protobuf is 4.25-6.33 on
-        # pkgs/main), so the <4 cap made diffusers unsatisfiable alongside pytorch/
-        # unsloth_zoo. protobuf is optional (extras-only) upstream, so run_constrained +
-        # a floor is sufficient. Supersedes diffusers#6.
+        # Deliberately relaxed from upstream's extras-only protobuf<4: the AR pytorch
+        # stack needs libprotobuf >=6, so <4 made diffusers unsatisfiable alongside
+        # pytorch/unsloth_zoo. A floor is enough here. Supersedes diffusers#6.
         - protobuf >=3.20.3
         - peft >=0.17.0
         - pytorch >=2.6
+        - bitsandbytes >=0.43.3
+        - gguf >=0.10.0
+        - torchao >=0.15.0
+        # Not packaged on pkgs/main or conda-forge yet; PyPI names normalized.
+        - optimum-quanto >=0.2.6
+        - nvidia-modelopt >=0.33.1
+        - sdnq >=0.2.2
     test:
       # Upstream tests live only on the GitHub merge (hoisted to upstream-github/tests/). This
       # output is packaged before work/ is torn down, so test/source_files globs succeed here
@@ -86,16 +91,15 @@ outputs:
         - huggingface_accelerate >=0.31.0
   - name: diffusers-torch
     build:
-      skip: true  # [py<310]
+      skip: true  # [py<311 or py>314]
       string: py{{ CONDA_PY }}_torch{{ pytorch | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
     requirements:
       host:
         - pip
         - python
         - setuptools
-        - wheel
-        # Build against the CBC pytorch (2.12) so pytorch's run_export version-pins
-        # diffusers-torch to >=2.12,<2.13, in lockstep with the rest of the torch stack.
+        # Build against each local-CBC pytorch line so pytorch's run_export version-pins
+        # diffusers-torch to that minor, in lockstep with the rest of the torch stack.
         # AR rebuilds against the CBC pytorch each migration (users get tested combos).
         - pytorch {{ pytorch }}
       run:
@@ -110,38 +114,13 @@ outputs:
       commands:
         - pip check
         # the diffusers-cli command requires pytorch at runtime,
-        # https://github.com/huggingface/diffusers/blob/main/src/diffusers/commands/fp16_safetensors.py#L27
+        # https://github.com/huggingface/diffusers/blob/v0.42.1/src/diffusers/commands/fp16_safetensors.py#L27
         - diffusers-cli --help
       requires:
         - pip
-  ## TODO: Enable once the flax toolchain is flushed out.
-  # - name: diffusers-flax
-  #   script: build_base.sh  # [unix]
-  #   build:
-  #     skip: true  # [win]
-  #   requirements:
-  #     host:
-  #       - pip
-  #       - python
-  #       - setuptools
-  #       - wheel
-  #     run:
-  #       - {{ pin_subpackage(name+'-base', exact=True) }}
-  #       - jax >=0.2.8,!=0.3.2
-  #       - jaxlib >=0.1.65
-  #       - flax
-  #   test:
-  #     imports:
-  #       - diffusers
-  #       - diffusers.models
-  #     commands:
-  #       - pip check
-  #       - diffusers-cli --help
-  #     requires:
-  #       - pip
   - name: diffusers
     build:
-      skip: true  # [py<310]
+      skip: true  # [py<311 or py>314]
       # Without the torch tag this metapackage dedupes across variants and
       # pin_subpackage(exact=True) then locks every consumer to one torch line.
       string: py{{ CONDA_PY }}_torch{{ pytorch | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
@@ -150,7 +129,6 @@ outputs:
         - pip
         - python
         - setuptools
-        - wheel
       run:
         - python
         - {{ pin_subpackage(name+'-torch', exact=True) }}
