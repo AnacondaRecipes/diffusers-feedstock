@@ -111,7 +111,9 @@ outputs:
       string: py{{ CONDA_PY }}_torch{{ pytorch | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
     requirements:
       host:
+        - pip
         - python
+        - setuptools
         # Build against each local-CBC pytorch line so pytorch's run_export version-pins
         # diffusers-torch to that minor, in lockstep with the rest of the torch stack.
         # AR rebuilds against the CBC pytorch each migration (users get tested combos).
@@ -140,7 +142,9 @@ outputs:
       string: py{{ CONDA_PY }}_torch{{ pytorch | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
     requirements:
       host:
+        - pip
         - python
+        - setuptools
       run:
         - python
         - {{ pin_subpackage(name+'-torch', exact=True) }}
